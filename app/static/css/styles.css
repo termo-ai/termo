@@ -1,0 +1,51 @@
+/* Additional custom styles beyond Tailwind */
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f2937; /* gray-800 */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4b5563; /* gray-600 */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280; /* gray-500 */
+}
+
+/* Smooth transitions for theme toggling */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Output content transitions */
+.output-content {
+    transition: max-height 0.3s ease-in-out;
+}
+
+/* Code block styling */
+pre code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Message group hover effects */
+.message-group:hover {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Directory tree styling */
+.directory-item .toggle-icon {
+    transition: transform 0.2s ease;
+}
+
+.directory-item .fa-chevron-down {
+    transform: rotate(90deg);
+}

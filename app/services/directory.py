@@ -4,21 +4,24 @@ from typing import List, Dict, Any
 
 class DirectoryService:
     @staticmethod
-    def get_directory_structure(path: str = "") -> List[Dict[str, Any]]:
+    def get_directory_structure() -> List[Dict[str, Any]]:
         """
-        Get the directory structure for the given path
+        Get the directory structure for the data directory
         """
-        base_path = os.path.join(os.getcwd(), path)
+        data_dir = os.path.join(os.getcwd(), "data")
         directory_structure = []
         
+        # Create data directory if it doesn't exist
+        os.makedirs(data_dir, exist_ok=True)
+        
         try:
-            for item in os.listdir(base_path):
-                full_path = os.path.join(base_path, item)
+            for item in os.listdir(data_dir):
+                full_path = os.path.join(data_dir, item)
                 is_dir = os.path.isdir(full_path)
                 directory_structure.append({
                     "name": item,
                     "isFolder": is_dir,
-                    "path": os.path.join(path, item) if path else item
+                    "path": os.path.join("data", item)
                 })
                 
             return directory_structure

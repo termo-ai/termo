@@ -6,6 +6,8 @@ let currentMessageContent = null;
 let currentCodeBlock = null;
 let currentOutputBlock = null;
 let isCodeBlockActive = false;
+let isAwaitingConfirmation = false;
+let confirmationResolver = null;
 
 function connect() {
     ws = new WebSocket(`ws://${window.location.host}/ws`);
@@ -23,7 +25,8 @@ function connect() {
         setTimeout(connect, 1000);
     };
 
-    ws.onmessage = function (event) {
+    // In websocket.js, update the confirmation handling
+    ws.onmessage = async function (event) {
         const data = JSON.parse(event.data);
 
         if (data.error) {
@@ -31,14 +34,68 @@ function connect() {
             return;
         }
 
-        if (data.type === 'message') {
-            handleMessageChunk(data.content);
-            isCodeBlockActive = false;
-        } else if (data.type === 'code') {
-            handleCodeChunk(data.content, data.language, data.start, data.end);
-            isCodeBlockActive = true;
-        } else if (data.type === 'output') {
-            handleOutputChunk(data.content);
+        if (data.type === 'confirmation') {
+            isAwaitingConfirmation = true;
+
+            // Set current code block status to pending
+            if (currentCodeBlock) {
+                updateCodeBlockStatus(currentCodeBlock, 'pending');
+            }
+
+            // Create and append confirmation buttons
+            const confirmationButtons = createConfirmationButtons();
+            if (currentMessageDiv) {
+                currentMessageDiv.appendChild(confirmationButtons);
+            } else {
+                currentMessageDiv = createMessageGroup('assistant');
+                currentMessageDiv.appendChild(confirmationButtons);
+            }
+
+            // Create a promise that will be resolved when the user makes a choice
+            const userChoice = await new Promise(resolve => {
+                confirmationResolver = resolve;
+
+                document.getElementById('confirm-execution').onclick = () => {
+                    resolve(true);
+                    confirmationButtons.remove();
+                    if (currentCodeBlock) {
+                        updateCodeBlockStatus(currentCodeBlock, 'executed');
+                    }
+                };
+
+                document.getElementById('reject-execution').onclick = () => {
+                    resolve(false);
+                    confirmationButtons.remove();
+                    if (currentCodeBlock) {
+                        updateCodeBlockStatus(currentCodeBlock, 'canceled');
+                    }
+                };
+            });
+
+            // Send the user's choice back to the server
+            ws.send(JSON.stringify({
+                type: 'confirmation_response',
+                confirmed: userChoice
+            }));
+
+            isAwaitingConfirmation = false;
+            confirmationResolver = null;
+
+        } else if (!isAwaitingConfirmation) {
+            // Handle regular message types as before
+            if (data.type === 'message') {
+                handleMessageChunk(data.content);
+                isCodeBlockActive = false;
+            } else if (data.type === 'code') {
+                handleCodeChunk(data.content, data.language, data.start, data.end);
+                isCodeBlockActive = true;
+                // Set initial pending status for new code blocks
+                if (data.start && currentCodeBlock) {
+                    updateCodeBlockStatus(currentCodeBlock, 'pending');
+                }
+            } else if (data.type === 'output') {
+                handleOutputChunk(data.content);
+            }
         }
 
         messageContainer.scrollTop = messageContainer.scrollHeight;

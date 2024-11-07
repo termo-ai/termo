@@ -11,13 +11,17 @@ function handleMessageChunk(content) {
     currentMessageContent.textContent += content;
 }
 
+// Modify handleCodeChunk function in chat.js
 function handleCodeChunk(code, language, start, end) {
     if (!currentCodeBlock || !isCodeBlockActive) {
         currentCodeBlock = document.createElement('div');
         currentCodeBlock.className = 'mt-2 bg-gray-900 rounded-lg group relative';
         currentCodeBlock.innerHTML = `
             <div class="flex justify-between items-center px-4 py-2 bg-gray-700 rounded-t-lg">
-                <span class="text-sm font-mono">${language || 'shell'}</span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-mono">${language || 'shell'}</span>
+                    <span class="code-execution-status"></span>
+                </div>
                 <div class="flex space-x-2">
                     <button onclick="copyCode(this)" class="text-sm text-gray-300 hover:text-white">
                         <i class="fas fa-copy"></i>
@@ -40,6 +44,25 @@ function handleCodeChunk(code, language, start, end) {
         if (existingCode !== newCode) {
             codeElement.textContent = newCode;
             Prism.highlightElement(codeElement);
+        }
+    }
+}
+
+// Add function to update code block status
+function updateCodeBlockStatus(codeBlock, status) {
+    const statusElement = codeBlock.querySelector('.code-execution-status');
+    if (statusElement) {
+        statusElement.className = 'code-execution-status text-sm px-2 py-0.5 rounded-md';
+        
+        if (status === 'executed') {
+            statusElement.className += ' bg-green-600/50 text-green-200';
+            statusElement.innerHTML = '<i class="fas fa-check-circle mr-1"></i>Executed';
+        } else if (status === 'canceled') {
+            statusElement.className += ' bg-red-600/50 text-red-200';
+            statusElement.innerHTML = '<i class="fas fa-ban mr-1"></i>Canceled';
+        } else if (status === 'pending') {
+            statusElement.className += ' bg-yellow-600/50 text-yellow-200';
+            statusElement.innerHTML = '<i class="fas fa-clock mr-1"></i>Pending';
         }
     }
 }
@@ -169,6 +192,21 @@ function clearChat() {
             </div>
         `;
     }
+}
+
+// In chat.js, add this function to create confirmation buttons
+function createConfirmationButtons() {
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'flex space-x-2 mt-2';
+    confirmationDiv.innerHTML = `
+        <button id="confirm-execution" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg">
+            <i class="fas fa-check mr-2"></i>Run Code
+        </button>
+        <button id="reject-execution" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+            <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+    `;
+    return confirmationDiv;
 }
 
 function exportChat() {

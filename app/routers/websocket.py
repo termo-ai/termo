@@ -47,16 +47,29 @@ async def websocket_endpoint(websocket: WebSocket):
                 for chunk in interpreter_instance.chat(prompt, stream=True, display=False):
                     processed_chunk = process_interpreter_chunk(chunk)
                     if processed_chunk:
-                        # Save assistant message
-                        conversation_service.add_message(
-                            conversation_id=conversation_id,
-                            role="assistant",
-                            type=processed_chunk.get("type", "message"),
-                            content=processed_chunk.get("content"),
-                            format=processed_chunk.get("format"),
-                            is_start=processed_chunk.get("start", False),
-                            is_end=processed_chunk.get("end", False)
-                        )
+                        # Handle confirmation messages separately
+                        if processed_chunk.get("type") == "confirmation":
+                            # Store the code content in the message
+                            conversation_service.add_message(
+                                conversation_id=conversation_id,
+                                role="assistant",
+                                type="confirmation",
+                                content=processed_chunk.get("content"),
+                                format=processed_chunk.get("format"),
+                                is_start=False,
+                                is_end=False
+                            )
+                        else:
+                            # Store other message types normally
+                            conversation_service.add_message(
+                                conversation_id=conversation_id,
+                                role="assistant",
+                                type=processed_chunk.get("type", "message"),
+                                content=processed_chunk.get("content"),
+                                format=processed_chunk.get("format"),
+                                is_start=processed_chunk.get("start", False),
+                                is_end=processed_chunk.get("end", False)
+                            )
                         
                         await websocket.send_json(processed_chunk)
                         

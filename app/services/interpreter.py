@@ -21,7 +21,7 @@ def process_interpreter_chunk(chunk):
             return {
                 "type": "code",
                 "content": chunk.get("content", ""),
-                "language": chunk.get("format", ""),
+                "format": chunk.get("format", ""),
                 "start": chunk.get("start", False),
                 "end": chunk.get("end", False)
             }
@@ -39,11 +39,20 @@ def process_interpreter_chunk(chunk):
                     "content": chunk.get("content")
                 }
         elif chunk.get("type") == "confirmation":
-            return {
-                "type": "confirmation",
-                "content": chunk.get("content", {})
-            }
+            content_dict = chunk.get("content", {})
+            pass
+            if isinstance(content_dict, dict):
+                return {
+                    "type": "confirmation",
+                    "content": content_dict.get("content", ""),
+                    "format": content_dict.get("format"),
+                }
+            else:
+                return {
+                    "type": "confirmation",
+                    "content": str(content_dict)
+                }
     
     return None  # Return None for unhandled chunk types
-
+pass
 interpreter_instance = configure_interpreter()

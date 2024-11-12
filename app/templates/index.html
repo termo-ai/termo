@@ -26,15 +26,21 @@
                 </div>
             </div>
 
-            <!-- Directory Structure -->
+                        <!-- Conversations -->
             <div class="flex-1 overflow-auto p-4">
+                <h2 class="text-sm font-semibold mb-3 text-gray-400 flex items-center">
+                    <i class="fas fa-message mr-2"></i> Conversations
+                </h2>
+                <div id="conversation-list" class="text-sm space-y-1"></div>
+            </div>
+
+            <!-- Directory Structure -->
+            <div class="border-t border-gray-700 p-4">
                 <h2 class="text-sm font-semibold mb-3 text-gray-400 flex items-center">
                     <i class="fas fa-folder-tree mr-2"></i> Directory Structure
                 </h2>
                 <div id="directory-tree" class="text-sm"></div>
-            </div>
-
-            <!-- Settings -->
+            </div><!-- Settings -->
             <div class="p-4 border-t border-gray-700">
                 <button onclick="toggleTheme()" class="text-sm text-gray-400 hover:text-white flex items-center">
                     <i class="fas fa-moon mr-2"></i> Toggle Theme
@@ -97,6 +103,7 @@
     <script src="{{ url_for('static', path='/js/ui/chat.js') }}"></script>
     <script src="{{ url_for('static', path='/js/ui/sidebar.js') }}"></script>
     <script src="{{ url_for('static', path='/js/ui/theme.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/ui/conversations.js') }}"></script>
 </body>
 
 </html>

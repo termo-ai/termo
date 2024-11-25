@@ -28,32 +28,10 @@ const ChatSection = () => {
         }
     };
 
-    // #region Hanlde Code Chunk
-    const handleCodeChunk = (code, language) => {
-        if (!currentMessage || currentMessage.type !== 'code') {
-            const newMessage = {
-                type: 'code',
-                content: code,
-                language: language || 'plaintext',
-                formatted: false  // Indica si el código ya ha sido formateado para visualización
-            };
-            setCurrentMessage(newMessage);
-            setMessages(prevMessages => [...prevMessages, newMessage]);
-        } else {
-            currentMessage.content += code;
-            setMessages(prevMessages => [...prevMessages.slice(0, -1), currentMessage]);
-        }
-    };
-    
-
     // #region Handle Send
     const handleSend = (message) => {
         handleMessageChunk(message);
         setCurrentMessage(null); 
-    };
-
-    const handleSendCode = (code, language) => {
-        handleCodeChunk(code, language);
     };
 
     console.log(messages)
@@ -83,7 +61,6 @@ const ChatSection = () => {
             )} 
             <InputSection
                 onSend={handleSend}
-                onSendCode={handleSendCode}
             />
         </div>
     );

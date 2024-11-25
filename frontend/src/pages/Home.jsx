@@ -1,6 +1,5 @@
 import React from "react";
 import ChatSection from "../components/chatItems/ChatSection";
-import HeaderSection from "../components/chatItems/HeaderSection";
 
 const Home = () => {
     return (

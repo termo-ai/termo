@@ -7,9 +7,19 @@ import 'prismjs/themes/prism-okaidia.css';
 const ChatSection = () => {
     const [messages, setMessages] = useState(initialMessages); // `initialMessages` asumido existente
     const [messageGroups, setMessageGroups] = useState([]);
+    const [codeStatuses, setCodeStatuses] = useState(
+        initialMessages.reduce((acc, _, idx) => {
+            acc[idx] = 'Pending';
+            return acc;
+        }, {})
+    );
+
+    const updateCodeStatus = (idx, status) => {
+        setCodeStatuses(prev => ({ ...prev, [idx]: status }));
+    };
 
     const Message = ({ content, role }) => (
-        <div className={`rounded-lg p-4 ${role === 'user' ? 'bg-gray-700' : 'bg-gray-600'}`}>
+        <div className={`rounded-lg ${role === 'user' ? 'bg-gray-700 p-4' : 'bg-gray-600'}`}>
             <div className="flex items-center mb-2">
                 <div className="font-bold">{role === 'user' ? 'You' : 'Assistant'}</div>
             </div>
@@ -17,26 +27,38 @@ const ChatSection = () => {
         </div>
     );
 
-    const Confirmation = ({ content }) => (
-        <div className="p-4 bg-gray-700 rounded-lg flex justify-between items-center">
-            <div>{content}</div>
-            <div className="flex space-x-2">
-                <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg">
+    const Confirmation = ({ content, language, setCodeStatus, codeStatus }) => (
+        <>
+            <CodeBlock content={content} language={language} codeStatus={codeStatus}/>
+            <div className="flex space-x-2 my-2">
+                <button 
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg"
+                    onClick={() => setCodeStatus('Executed')}    
+                >
                     Run Code
                 </button>
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+                <button 
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+                    onClick={() => setCodeStatus('Canceled')}    
+                >
                     Cancel
                 </button>
             </div>
-        </div>
+        </>
     );
 
-    const CodeBlock = ({ content, role, language }) => (
+    const CodeBlock = ({ content, language, codeStatus }) => (
         <div className="mt-2 bg-gray-700 rounded-lg group relative">
-            <div className="flex justify-between items-center px-4 py-2 bg-gray-800 rounded-t-lg">
+            <div className="flex justify-between items-center px-4 py-2 bg-gray-700 rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <span className="text-sm font-mono">{language || 'shell'}</span>
-                    <span className="code-execution-status"></span>
+                    <span className={`code-execution-status text-sm px-2 py-0.5 rounded-md ${
+                        codeStatus === 'Executed' ? 'bg-green-600/50 text-green-200' :
+                        codeStatus === 'Canceled' ? 'bg-red-600/50 text-red-200' :
+                        'bg-yellow-600/50 text-yellow-200'
+                    }`}>
+                        {codeStatus}
+                    </span>
                 </div>
                 <div className="flex space-x-2">
                     <button onclick="copyCode(this)" className="text-sm text-gray-300 hover:text-white">
@@ -74,14 +96,14 @@ const ChatSection = () => {
     }, [messages]);
 
     useEffect(() => {
-        // Agrupar mensajes del asistente hasta un mensaje de tipo 'output'
         const groupedMessages = [];
         let currentGroup = [];
-
+    
         messages.forEach((message) => {
             if (message.role === 'assistant') {
                 currentGroup.push(message);
-                if (message.type === 'output') {
+                // Verificar si el mensaje es 'output' con contenido significativo
+                if (message.type === 'output' && message.content.trim() && message.content !== '\n' && message.content !== '\n\n') {
                     groupedMessages.push([...currentGroup]);
                     currentGroup = [];
                 }
@@ -93,17 +115,20 @@ const ChatSection = () => {
                 groupedMessages.push([message]);
             }
         });
-
+    
         if (currentGroup.length > 0) {
             groupedMessages.push([...currentGroup]);
         }
-
+    
         setMessageGroups(groupedMessages);
-    }, [messages]);
+    }, [messages]);   
 
     const handleSend = (message) => {
         setMessages((prevMessages) => [...prevMessages, message]);
     };
+
+    console.log("messages: ", messages);
+    console.log("messageGroups: ", messageGroups)
 
     return (
         <div className="h-full w-full flex flex-col bg-gray-900 border-l border-gray-700">
@@ -120,20 +145,20 @@ const ChatSection = () => {
                         >
                             {isAssistantGroup ? (
                                 <div>
-                                    {group.map((msg, msgIdx) => {
+                                    {group.filter(msg => msg.content.trim() && msg.content !== '\n' && msg.content !== '\n\n').map((msg, msgIdx) => {
                                         switch (msg.type) {
                                             case 'message':
                                                 return <Message key={msgIdx} content={msg.content} role={msg.role} />;
                                             case 'confirmation':
-                                                return <Confirmation key={msgIdx} content={msg.content} />;
+                                                if (codeStatuses[msgIdx] === 'Pending') {
+                                                    return <Confirmation key={msgIdx} content={msg.content} language={msg.format} setCodeStatus={(status) => updateCodeStatus(msgIdx, status)} codeStatus={codeStatuses[msgIdx]} />;
+                                                }
+                                                break;
                                             case 'code':
-                                                return (
-                                                    <CodeBlock
-                                                        key={msgIdx}
-                                                        content={msg.content}
-                                                        language={msg.language}
-                                                    />
-                                                );
+                                                if (codeStatuses[msgIdx] !== 'Pending') {
+                                                    return <CodeBlock key={msgIdx} content={msg.content} language={msg.format} codeStatus={codeStatuses[msgIdx]} />;
+                                                }
+                                                break;
                                             case 'output':
                                                 return <Output key={msgIdx} content={msg.content} />;
                                             default:

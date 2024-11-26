@@ -1,12 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import InputSection from './InputSection';
 import HeaderSection from './HeaderSection';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-okaidia.css';
 
 const ChatSection = () => {
+    // #region States Refs & Effects
     const [messages, setMessages] = useState(initialMessages); // `initialMessages` asumido existente
     const [messageGroups, setMessageGroups] = useState([]);
+    const [expanded, setExpanded] = useState({});
+    const outputRef = useRef(null);
+
+    useEffect(() => {
+        Prism.highlightAll();
+    }, [messages]);
+
+    useEffect(() => {
+        const groupedMessages = [];
+        let currentGroup = [];
+    
+        messages.forEach((message) => {
+            if (message.role === 'assistant') {
+                currentGroup.push(message);
+                // Verificar si el mensaje es 'output' con contenido significativo
+                if (message.type === 'output' && message.content.trim() && message.content !== '\n' && message.content !== '\n\n') {
+                    groupedMessages.push([...currentGroup]);
+                    currentGroup = [];
+                }
+            } else {
+                if (currentGroup.length > 0) {
+                    groupedMessages.push([...currentGroup]);
+                    currentGroup = [];
+                }
+                groupedMessages.push([message]);
+            }
+        });
+    
+        if (currentGroup.length > 0) {
+            groupedMessages.push([...currentGroup]);
+        }
+    
+        setMessageGroups(groupedMessages);
+    }, [messages]);   
+
+    // #region Functios
+    const handleSend = (message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    const expand = (messageId) => {
+        setExpanded(prevState => ({
+            ...prevState,
+            [messageId]: !prevState[messageId],  // Cambia el estado solo del mensaje correspondiente
+        }));
+    };
 
     const updateMessageStatus = (messageId, newStatus) => {
         setMessages((prevMessages) => {
@@ -25,6 +72,7 @@ const ChatSection = () => {
         });
     };
 
+    // #region JSX Assistants
     const Message = ({ content, role }) => (
         <div className={`rounded-lg ${role === 'user' ? 'bg-gray-700 p-4' : 'bg-gray-600'}`}>
             <div className="flex items-center mb-2">
@@ -79,7 +127,7 @@ const ChatSection = () => {
         </div>
     );
 
-    const Output = ({ content }) => (
+    const Output = ({ content, messageId }) => (
         <div className="mt-2 bg-gray-700 rounded-lg group relative">
             <div className="flex justify-between items-center px-4 py-2 bg-gray-800 rounded-t-lg">
                 <span className="text-sm text-white">Output</span>
@@ -87,56 +135,30 @@ const ChatSection = () => {
                     <button className="text-sm text-gray-300 hover:text-white" title="Copy output">
                         C
                     </button>
-                    <button className="text-sm text-gray-300 hover:text-white" title="Expand/Collapse">
+                    <button 
+                        className="text-sm text-gray-300 hover:text-white" 
+                        title="Expand/Collapse"
+                        onClick={() => expand(messageId)}  // Usar el messageId al hacer clic
+                    >
                         E
                     </button>
                 </div>
             </div>
-            <div className="p-4 font-mono text-sm whitespace-pre-wrap bg-gray-700">
+            <div 
+                ref={outputRef}
+                className={`p-4 font-mono text-sm whitespace-pre-wrap bg-gray-700 overflow-auto
+                    ${expanded[messageId] ? 'max-h-none' : 'max-h-60'}
+                `}
+            >
                 {content}
             </div>
         </div>
-    );
-
-    useEffect(() => {
-        Prism.highlightAll();
-    }, [messages]);
-
-    useEffect(() => {
-        const groupedMessages = [];
-        let currentGroup = [];
-    
-        messages.forEach((message) => {
-            if (message.role === 'assistant') {
-                currentGroup.push(message);
-                // Verificar si el mensaje es 'output' con contenido significativo
-                if (message.type === 'output' && message.content.trim() && message.content !== '\n' && message.content !== '\n\n') {
-                    groupedMessages.push([...currentGroup]);
-                    currentGroup = [];
-                }
-            } else {
-                if (currentGroup.length > 0) {
-                    groupedMessages.push([...currentGroup]);
-                    currentGroup = [];
-                }
-                groupedMessages.push([message]);
-            }
-        });
-    
-        if (currentGroup.length > 0) {
-            groupedMessages.push([...currentGroup]);
-        }
-    
-        setMessageGroups(groupedMessages);
-    }, [messages]);   
-
-    const handleSend = (message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
-    };
+    );    
 
     /* console.log("messages: ", messages);
     console.log("messageGroups: ", messageGroups) */
 
+    // #region MAIN JSX
     return (
         <div className="h-full w-full flex flex-col bg-gray-900 border-l border-gray-700">
             <HeaderSection />
@@ -175,7 +197,7 @@ const ChatSection = () => {
                                                     }
                                                     break;
                                                 case 'output':
-                                                    return <Output key={msgIdx} content={msg.content} />;
+                                                    return <Output key={msgIdx} content={msg.content} messageId={msg.id} />;
                                                 default:
                                                     return null;
                                             }

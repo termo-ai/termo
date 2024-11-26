@@ -1,4 +1,6 @@
 import React from 'react';
+import Clear from '../icons/trash.svg';
+import Export from '../icons/download.svg';
 
 const HeaderSection = ({ onClear, onExport }) => {
     return (
@@ -6,16 +8,30 @@ const HeaderSection = ({ onClear, onExport }) => {
             <div className="flex space-x-4">
                 <button 
                     onClick={onClear} 
-                    className="text-sm text-gray-400 hover:text-white flex items-center"
+                    className="flex flex-row items-baseline text-sm text-gray-400 hover:text-white group"
                 >
-                    {/* Add trash/delete icon */}
+                    <div className='invert opacity-60 group-hover:opacity-100 mx-1'>
+                        <img
+                            src={Clear}
+                            alt="Clear"
+                            width="12"
+                            height="12"
+                        />
+                    </div>
                     Clear Chat
                 </button>
                 <button 
                     onClick={onExport}
-                    className="text-sm text-gray-400 hover:text-white flex items-center"
+                    className="flex flex-row items-baseline text-sm text-gray-400 hover:text-white group"
                 >
-                    {/* Add export/download icon */}
+                    <div className='invert opacity-60 group-hover:opacity-100 mx-1'>
+                        <img
+                            src={Export}
+                            alt="Clear"
+                            width="12"
+                            height="12"
+                        />
+                    </div>
                     Export Chat
                 </button>
             </div>

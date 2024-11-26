@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Send from '../icons/plane.svg'
 
 const InputSection = ({
     onSend,
@@ -47,7 +48,15 @@ const InputSection = ({
                     onClick={handleSubmit}
                 >
                     <span>Send</span>
-                    {/* add paper plane icon */}
+                    <div className='invert ml-2'>
+                        <img
+                            src={Send}
+                            alt='Send'
+                            width="16"
+                            height="16"
+                        />
+                    </div>
+                    
                 </button>
             </div>
         </div>

@@ -3,6 +3,12 @@ import InputSection from './InputSection';
 import HeaderSection from './HeaderSection';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-okaidia.css';
+import Expand from '../icons/expand.svg';
+import User from '../icons/user-alt.svg';
+import Bot from '../icons/robot.svg';
+import Delete from '../icons/trash.svg';
+import Copy from '../icons/copy.svg';
+import Compress from '../icons/compress.svg'
 
 const ChatSection = () => {
     // #region States Refs & Effects
@@ -160,6 +166,14 @@ const ChatSection = () => {
     const Message = ({ content, role }) => (
         <div className={`rounded-lg ${role === 'user' ? 'bg-gray-700 p-4' : 'bg-gray-600'}`}>
             <div className="flex items-center mb-2">
+                <div className='invert mr-2'>
+                    <img
+                        src={role === 'user' ? User : Bot}
+                        alt={role === 'user' ? 'You' : 'Assistant'}
+                        height={role === 'user' ? "14" : "18"}
+                        width={role === 'user' ? "14" : "18"}
+                    />
+                </div>
                 <div className="font-bold">
                     {role === 'user' ? 'You' : 'Assistant'}
                 </div>
@@ -206,10 +220,15 @@ const ChatSection = () => {
                 <div className="flex space-x-2">
                     <button 
                         onClick={() => copyToClipboard(content)} 
-                        className="text-sm text-gray-300 hover:text-white"
-                        title='Copy Code'
+                        className="invert opacity-70 hover:opacity-100" 
+                        title="Copy output"
                     >
-                        C
+                        <img
+                            src={Copy}
+                            alt="Copy"
+                            width="14"
+                            height="14"
+                        />
                     </button>
                 </div>
             </div>
@@ -227,20 +246,30 @@ const ChatSection = () => {
                 <span className="text-sm text-white">
                     Output
                 </span>
-                <div className="flex space-x-2">
+                <div className="flex flex-row space-x-4">
                     <button 
                         onClick={() => copyToClipboard(content)} 
-                        className="text-sm text-gray-300 hover:text-white" 
+                        className="invert opacity-70 hover:opacity-100" 
                         title="Copy output"
                     >
-                        C
+                        <img
+                            src={Copy}
+                            alt="Copy"
+                            width="14"
+                            height="14"
+                        />
                     </button>
                     <button 
-                        className="text-sm text-gray-300 hover:text-white" 
+                        className="invert opacity-70 hover:opacity-100" 
                         title="Expand/Collapse"
                         onClick={() => expand(messageId)}  // Usar el messageId al hacer clic
                     >
-                        E
+                        <img
+                            src={expanded[messageId] ? Compress : Expand}
+                            alt={expanded[messageId] ? "Compress" : "Expand"}
+                            width="14"
+                            height="14"
+                        />
                     </button>
                 </div>
             </div>
@@ -284,7 +313,14 @@ const ChatSection = () => {
                                                     onClick={() => handleDelete(groupIdx)}
                                                     className='absolute top-0 right-3'
                                                 >
-                                                    D
+                                                    <div className='invert opacity-60 hover:opacity-100'>
+                                                        <img
+                                                            src={Delete}
+                                                            alt='Delete'
+                                                            width='16'
+                                                            height='16'
+                                                        />
+                                                    </div>
                                                 </button>
                                             )}
                                             {group.filter(msg => msg.content.trim() && msg.content !== '\n' && msg.content !== '\n\n').map((msg, msgIdx) => {
@@ -316,7 +352,14 @@ const ChatSection = () => {
                                                         onClick={() => handleDelete(msgIdx)}
                                                         className='absolute top-4 right-7'
                                                     >
-                                                        D
+                                                        <div className='invert opacity-60 hover:opacity-100'>
+                                                            <img
+                                                                src={Delete}
+                                                                alt='Delete'
+                                                                width='16'
+                                                                height='16'
+                                                            />
+                                                        </div>
                                                     </button>
                                                 )}
                                                 <Message

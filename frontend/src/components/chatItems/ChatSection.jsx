@@ -122,6 +122,23 @@ const ChatSection = () => {
         });
     };
 
+    const handleDelete = (groupIdx) => {
+        setMessageGroups((prevGroups) => {
+            // Elimina el grupo con el índice especificado
+            const updatedGroups = [...prevGroups];
+            updatedGroups.splice(groupIdx, 1);
+            return updatedGroups;
+        });
+    
+        setMessages((prevMessages) => {
+            // Filtra los mensajes eliminados para reflejar la nueva estructura
+            const messagesToRemove = messageGroups[groupIdx].map((msg) => msg.id);
+            return prevMessages.filter((msg) => !messagesToRemove.includes(msg.id));
+        });
+    
+        console.log(`Group ${groupIdx} deleted successfully.`);
+    };
+
     const updateMessageStatus = (messageId, newStatus) => {
         setMessages((prevMessages) => {
             const updatedMessages = prevMessages.map((message, index) => {
@@ -253,47 +270,65 @@ const ChatSection = () => {
                     </div>
                 ) : (
                     messageGroups.map((group, groupIdx) => {
-                        const isAssistantGroup =
-                            group.length > 0 && group[0].role === 'assistant';
-                                return (
-                                    <div
-                                        key={groupIdx}
-                                        className={`space-y-4 ${isAssistantGroup ? 'bg-gray-600 rounded-lg p-4' : ''}`}
-                                    >
-                                        {isAssistantGroup ? (
-                                            <div>
-                                                {group.filter(msg => msg.content.trim() && msg.content !== '\n' && msg.content !== '\n\n').map((msg, msgIdx) => {
-                                                    switch (msg.type) {
-                                                        case 'message':
-                                                            return <Message key={msgIdx} content={msg.content} role={msg.role} />;
-                                                        case 'confirmation':
-                                                            if (msg.status === 'Pending') {
-                                                                return <Confirmation key={msgIdx} content={msg.content} language={msg.format} status={msg.status} messageId={msg.id} />;
-                                                            }
-                                                        break;
-                                                        case 'code':
-                                                            if (msg.status !== 'Pending') {
-                                                                return <CodeBlock key={msgIdx} content={msg.content} language={msg.format} status={msg.status} />;
-                                                            }
-                                                        break;
-                                                        case 'output':
-                                                            return <Output key={msgIdx} content={msg.content} messageId={msg.id} />;
-                                                        default:
-                                                        return null;
-                                                    }
-                                                })}
-                                            </div>
-                                        ) : (
-                                            group.map((msg, msgIdx) => (
+                        const isAssistantGroup = group.length > 0 && group[0].role === 'assistant';
+                        const isLastGroup = groupIdx === messageGroups.length - 1;;
+                            return (
+                                <div
+                                    key={groupIdx}
+                                    className={`space-y-4 ${isAssistantGroup ? 'bg-gray-600 rounded-lg p-4' : ''}`}
+                                >
+                                    {isAssistantGroup ? (
+                                        <div className='relative'>
+                                            {isLastGroup && (
+                                                <button 
+                                                    onClick={() => handleDelete(groupIdx)}
+                                                    className='absolute top-0 right-3'
+                                                >
+                                                    D
+                                                </button>
+                                            )}
+                                            {group.filter(msg => msg.content.trim() && msg.content !== '\n' && msg.content !== '\n\n').map((msg, msgIdx) => {
+                                                switch (msg.type) {
+                                                    case 'message':
+                                                        return <Message key={msgIdx} content={msg.content} role={msg.role} />;
+                                                    case 'confirmation':
+                                                        if (msg.status === 'Pending') {
+                                                            return <Confirmation key={msgIdx} content={msg.content} language={msg.format} status={msg.status} messageId={msg.id} />;
+                                                        }
+                                                    break;
+                                                    case 'code':
+                                                        if (msg.status !== 'Pending') {
+                                                            return <CodeBlock key={msgIdx} content={msg.content} language={msg.format} status={msg.status} />;
+                                                        }
+                                                    break;
+                                                    case 'output':
+                                                        return <Output key={msgIdx} content={msg.content} messageId={msg.id} />;
+                                                    default:
+                                                    return null;
+                                                }
+                                            })}
+                                        </div>
+                                    ) : (
+                                        group.map((msg, msgIdx) => (
+                                            <div className='relative'>
+                                                {isLastGroup && (
+                                                    <button 
+                                                        onClick={() => handleDelete(msgIdx)}
+                                                        className='absolute top-4 right-7'
+                                                    >
+                                                        D
+                                                    </button>
+                                                )}
                                                 <Message
                                                     key={msgIdx}
                                                     content={msg.content}
                                                     role={msg.role}
                                                 />
-                                            ))
-                                        )}
-                                    </div>
-                                );
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            );
                     })
                 )}
             </div>

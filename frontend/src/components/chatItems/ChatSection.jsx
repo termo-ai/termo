@@ -282,6 +282,7 @@ const ChatSection = () => {
     );
 };
 
+// #region Initial Messages
 const initialMessages = [
     {
         "id": 23,

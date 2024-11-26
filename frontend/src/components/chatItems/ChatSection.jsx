@@ -44,6 +44,19 @@ const ChatSection = () => {
     }, [messages]);   
 
     // #region Functios
+    const clearMessages = () => {
+        if (window.confirm("Are you sure you want to clear the chat? This action cannot be undone.")) {
+            console.log("Clearing chat...");
+            setMessages([]); // Vacía el estado de mensajes
+        } else {
+            console.log("Clear chat canceled.");
+        }
+    };
+
+    useEffect(() => {
+        console.log(messages)
+    },[messages])
+
     const handleSend = (message) => {
         setMessages((prevMessages) => [...prevMessages, message]);
     };
@@ -187,7 +200,8 @@ const ChatSection = () => {
     // #region MAIN JSX
     return (
         <div className="h-full w-full flex flex-col bg-gray-900 border-l border-gray-700">
-            <HeaderSection />
+            <HeaderSection onClear={clearMessages}/>
+            {/* Main Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messageGroups.length === 0 ? (
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">

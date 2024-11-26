@@ -6,7 +6,7 @@ import 'prismjs/themes/prism-okaidia.css';
 
 const ChatSection = () => {
     // #region States Refs & Effects
-    const [messages, setMessages] = useState(initialMessages); // `initialMessages` asumido existente
+    const [messages, setMessages] = useState(initialMessages);
     const [messageGroups, setMessageGroups] = useState([]);
     const [expanded, setExpanded] = useState({});
     const outputRef = useRef(null);
@@ -22,7 +22,7 @@ const ChatSection = () => {
         messages.forEach((message) => {
             if (message.role === 'assistant') {
                 currentGroup.push(message);
-                // Verificar si el mensaje es 'output' con contenido significativo
+                // Check if the message is 'output' with meaningful content
                 if (message.type === 'output' && message.content.trim() && message.content !== '\n' && message.content !== '\n\n') {
                     groupedMessages.push([...currentGroup]);
                     currentGroup = [];
@@ -41,7 +41,7 @@ const ChatSection = () => {
         }
 
         setMessageGroups(groupedMessages);
-    }, [messages]);   
+    }, [messages]);
 
     // #region Functios
     const clearMessages = () => {
@@ -56,9 +56,32 @@ const ChatSection = () => {
     const expand = (messageId) => {
         setExpanded(prevState => ({
             ...prevState,
-            [messageId]: !prevState[messageId],  // Cambia el estado solo del mensaje correspondiente
+            [messageId]: !prevState[messageId],  // Change the status of corresponding message
         }));
     };
+
+    const exportChat = () => {
+        if (!messages.length) {
+            console.log("No messages to export.");
+            return;
+        }
+    
+        // Create JSON content from messages
+        const fileContent = JSON.stringify(messages, null, 2); // Formatted for easy reading
+        const blob = new Blob([fileContent], { type: "application/json" });
+    
+        // Create a temporary link to download the file
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `chat_export_${new Date().toISOString()}.json`; // Dynamic name based on current date
+        document.body.appendChild(link);
+        link.click();
+    
+        // Clean the link after use
+        document.body.removeChild(link);
+        console.log("Chat exported successfully.");
+    };
+    
 
     const copyToClipboard = (content) => {
         navigator.clipboard.writeText(content)
@@ -72,29 +95,29 @@ const ChatSection = () => {
 
     const handleSend = (message) => {
         setMessages((prevMessages) => {
-            // Obtener el último mensaje y calcular el siguiente `sequence_id`
+            // Get ids
             const lastMessage = prevMessages[prevMessages.length - 1];
             const nextId = lastMessage?.id
                 ? parseInt(lastMessage.id, 10) + 1 
-                : 1 // Si no hay mensajes previos, comenzar desde 1
+                : 1 // If there are no previous messages, start from 1
             const nextSequenceId = lastMessage?.sequence_id
                 ? parseInt(lastMessage.sequence_id, 10) + 1
-                : 1; // Si no hay mensajes previos, comenzar desde 1
-    
-            // Crear el nuevo mensaje en el formato requerido
+                : 1; // If there are no previous messages, start from 1
+
+            // Create new message
             const newMessage = {
                 id: nextId, 
                 sequence_id: nextSequenceId,
                 role: "user",
                 type: "message",
                 content: message,
-                created_at: new Date().toISOString(), // Formato ISO para la fecha actual
+                created_at: new Date().toISOString(),
                 is_end: false,
                 is_start: false,
                 status: null,
             };
     
-            // Retornar el nuevo arreglo de mensajes con el mensaje agregado
+            // Return new messages
             return [...prevMessages, newMessage];
         });
     };
@@ -102,11 +125,11 @@ const ChatSection = () => {
     const updateMessageStatus = (messageId, newStatus) => {
         setMessages((prevMessages) => {
             const updatedMessages = prevMessages.map((message, index) => {
-                // Si el id del mensaje coincide, actualizamos el status
+                // id matches, update status
                 if (message.id === messageId) {
                     return { ...message, status: newStatus };
                 }  
-                // También actualizamos el siguiente mensaje (si existe) al mismo tiempo
+                // update next message (if it exists) at the same time
                 if (prevMessages[index - 1]?.id === messageId) {
                     return { ...message, status: newStatus };
                 }    
@@ -213,15 +236,12 @@ const ChatSection = () => {
                 {content}
             </div>
         </div>
-    );    
-
-    console.log("messages: ", messages);
-    console.log("messageGroups: ", messageGroups)
+    );
 
     // #region MAIN JSX
     return (
         <div className="h-full w-full flex flex-col bg-gray-900 border-l border-gray-700">
-            <HeaderSection onClear={clearMessages}/>
+            <HeaderSection onClear={clearMessages} onExport={exportChat}/>
             {/* Main Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messageGroups.length === 0 ? (
@@ -667,7 +687,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:59",
         "is_end": false,
         "is_start": false,
-        "status": "Executed"
+        "status": "Pending"
     },
     {
         "id": 57,
@@ -679,9 +699,9 @@ const initialMessages = [
         "created_at": "2024-11-21T23:34:05",
         "is_end": true,
         "is_start": true,
-        "status": "Executed"
+        "status": "Pending"
     },
-    {
+    /* {
         "id": 58,
         "sequence_id": 36,
         "role": "assistant",
@@ -724,7 +744,7 @@ const initialMessages = [
         "is_end": false,
         "is_start": false,
         "status": null
-    }
+    } */
 ]  
 
 export default ChatSection;

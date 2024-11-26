@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import ChatIcon from '../icons/comment.svg';
+import Delete from '../icons/trash.svg'
+import Tree from '../icons/structure.svg'
+import Upload from '../icons/upload.svg'
+import File from '../icons/file.svg';
+import Moon from '../icons/moon.svg';
 
 const SidebarSection = () => {
   const [chats, setChats] = useState([]);
@@ -14,13 +20,13 @@ const SidebarSection = () => {
     setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
   };
   return (
-    <div className="w-1/4 bg-gray-800 flex flex-col justify-between h-screen border-r border-gray-700">
+    <div className="w-1/6 bg-gray-800 flex flex-col justify-between h-screen border-r border-gray-700">
       {/* Top Section */}
       <div className="border-b border-gray-700">
         <div className="p-4">
           <h1 className="text-xl font-bold">Termo AI</h1>
           <div className="flex items-center mt-2 gap-2">
-            <div className="w-2 h-2 bg-green-700 rounded-full"></div>
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
             <p className="text-sm">Reconnecting...</p>
           </div>
         </div>
@@ -29,27 +35,66 @@ const SidebarSection = () => {
       {/* Middle Section */}
       <div className="p-4 grow">
         <div>
-          <p className="text-md text-stone-300 font-bold">Conversation</p>
+          <div className="text-md text-stone-300 font-bold flex flex-row items-center">
+            <div className="invert opacity-60 pr-2">
+              <img
+                src={ChatIcon}
+                alt="Chat"
+                width="14"
+                height="14"
+              />
+            </div>
+            Conversation
+          </div>
         </div>
         <button
           onClick={handleAddChat}
-          className="mt-4 px-4 py-1 text-gray-300 rounded hover:bg-gray-300 hover:text-gray-800 transition"
+          className="mt-4 pl-2 pr-4 py-2 text-gray-300 rounded-lg hover:bg-gray-500/50 transition flex items-center"
         >
-          Add New Chat
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-5 h-5 mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+          New Chat
         </button>
         {/* Chat List */}
         <div className="mt-4 flex flex-col gap-1">
           {chats.map((chat) => (
             <div
               key={chat.id}
-              className="flex items-center justify-between px-4 py-1 bg-gray-800 rounded group hover:bg-gray-300 hover:text-gray-800 transition"
+              className="flex items-center justify-between px-4 py-2 text-gray-300 bg-gray-800 rounded-lg group hover:bg-gray-500/50 transition"
             >
-              <span>{chat.name}</span>
+              <div className="flex flex-row space-x-3 items-center">
+                  <div className="invert opacity-60">
+                    <img
+                      src={ChatIcon}
+                      alt='Chat'
+                      width='14'
+                      height='14'
+                    />
+                  </div>
+                  <span>{chat.name}</span>
+              </div>
               <button
                 onClick={() => handleDeleteChat(chat.id)}
-                className="text-gray-100 opacity-0 group-hover:opacity-100 group-hover:text-gray-500 hover:!text-red-600 transition"
+                className="invert opacity-0 group-hover:opacity-60"
               >
-                trash
+                <img
+                  src={Delete}
+                  alt="Delete"
+                  width="14"
+                  height="14"
+                />
               </button>
             </div>
           ))}
@@ -59,18 +104,52 @@ const SidebarSection = () => {
       {/* Bottom Section */}
       <div className="border-t border-gray-700">
         <div className="p-4">
-          <button className="text-sm text-gray-400">Directory Structure</button>
+          <button className="text-sm text-gray-400 flex items-center font-bold bg-transparent hover:bg-gray-500/50 px-4 py-2 rounded-lg">
+            <div className="invert opacity-60 pr-2">
+              <img
+                src={Tree}
+                alt="Tree"
+                width="18"
+                height="18"
+              />
+            </div>
+            Directory Structure
+          </button>
           <div className="flex flex-col">
-            <button className="mt-4 px-4 py-1 text-gray-300 rounded hover:bg-gray-300 hover:text-gray-800 transition border border-gray-700">
+            <button className="mt-4 px-4 py-2 text-sm text-gray-300 rounded hover:bg-gray-300 hover:text-gray-800 transition border border-gray-700 group flex items-center justify-center">
+              <div className="invert opacity-60 group-hover:opacity-75 group-hover:invert-0 pr-2">
+                <img
+                  src={Upload}
+                  alt="Upload"
+                  width="14"
+                  height="14"
+                />
+              </div>
               Upload File
             </button>
-            <button className="mt-4 px-4 py-1 text-gray-300 rounded hover:bg-gray-300 hover:text-gray-800 transition">
-              Conversation Db
+            <button className="mt-4 px-4 py-1 text-sm text-gray-300 hover:text-white transition group flex items-center justify-center">
+              <div className="invert opacity-60 group-hover:opacity-100 pr-2">
+                <img
+                  src={File}
+                  alt="File"
+                  width="14"
+                  height="14"
+                />
+              </div>
+              Conversations.db
             </button>
           </div>
         </div>
         <div className="border-t border-gray-700 flex flex-col p-4">
-          <button className="px-4 py-1 text-gray-300 rounded hover:bg-gray-300 hover:text-gray-800 transition">
+          <button className="px-4 py-1 text-sm text-gray-300 hover:text-white transition group flex items-center justify-start">
+            <div className="invert opacity-60 group-hover:opacity-100 pr-2">
+              <img
+                src={Moon}
+                alt="File"
+                width="12"
+                height="12"
+              />
+            </div>
             Toggle Time
           </button>
         </div>

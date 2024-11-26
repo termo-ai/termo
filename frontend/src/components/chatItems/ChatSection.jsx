@@ -9,6 +9,9 @@ import Bot from '../icons/robot.svg';
 import Delete from '../icons/trash.svg';
 import Copy from '../icons/copy.svg';
 import Compress from '../icons/compress.svg'
+import Check from '../icons/check.svg';
+import Pendig from '../icons/clock.svg';
+import Cancel from '../icons/uncheck.svg';
 
 const ChatSection = () => {
     // #region States Refs & Effects
@@ -209,13 +212,21 @@ const ChatSection = () => {
                     <span className="text-sm font-mono">
                         {language || 'shell'}
                     </span>
-                    <span className={`code-execution-status text-sm px-2 py-0.5 rounded-md ${
+                    <div className={`flex items-center code-execution-status text-sm px-2 rounded-md ${
                         status === 'Executed' ? 'bg-green-600/50 text-green-200' :
                         status === 'Canceled' ? 'bg-red-600/50 text-red-200' :
                         'bg-yellow-600/50 text-yellow-200'
                     }`}>
+                        <div className='invert opacity-75 pr-1'>
+                            <img
+                                src={status === 'Executed' ? Check : status === 'Canceled' ? Cancel : Pendig}
+                                alt={status}
+                                width="12"
+                                height="12"
+                            />
+                        </div>
                         {status}
-                    </span>
+                    </div>
                 </div>
                 <div className="flex space-x-2">
                     <button 
@@ -286,7 +297,7 @@ const ChatSection = () => {
 
     // #region MAIN JSX
     return (
-        <div className="h-full w-full flex flex-col bg-gray-900 border-l border-gray-700">
+        <div className="h-full w-full flex flex-col bg-gray-900">
             <HeaderSection onClear={clearMessages} onExport={exportChat}/>
             {/* Main Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">

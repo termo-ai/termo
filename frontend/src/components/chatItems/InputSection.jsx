@@ -38,14 +38,16 @@ const InputSection = ({
                         onKeyDown={handleKeyPress}
                     >
                     </textarea>
-                    <div class="absolute right-3 bottom-3 text-gray-400 text-sm">{inputText && inputText.length>0 ? inputText.length : '0'}</div>
+                    <div class="absolute right-3 bottom-3 text-gray-400 text-sm">
+                        {inputText && inputText.length>0 ? inputText.length : '0'}
+                    </div>
                 </div>
                 <button 
                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg flex items-center"
                     onClick={handleSubmit}
                 >
-                <span>Send</span>
-                {/* add paper plane icon */}
+                    <span>Send</span>
+                    {/* add paper plane icon */}
                 </button>
             </div>
         </div>

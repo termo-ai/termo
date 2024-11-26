@@ -47,18 +47,10 @@ const ChatSection = () => {
     const clearMessages = () => {
         if (window.confirm("Are you sure you want to clear the chat? This action cannot be undone.")) {
             console.log("Clearing chat...");
-            setMessages([]); // Vacía el estado de mensajes
+            setMessages([]);
         } else {
             console.log("Clear chat canceled.");
         }
-    };
-
-    useEffect(() => {
-        console.log(messages)
-    },[messages])
-
-    const handleSend = (message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
     };
 
     const expand = (messageId) => {
@@ -76,6 +68,35 @@ const ChatSection = () => {
             .catch((error) => {
                 console.error('Failed to copy content:', error);
             });
+    };
+
+    const handleSend = (message) => {
+        setMessages((prevMessages) => {
+            // Obtener el último mensaje y calcular el siguiente `sequence_id`
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            const nextId = lastMessage?.id
+                ? parseInt(lastMessage.id, 10) + 1 
+                : 1 // Si no hay mensajes previos, comenzar desde 1
+            const nextSequenceId = lastMessage?.sequence_id
+                ? parseInt(lastMessage.sequence_id, 10) + 1
+                : 1; // Si no hay mensajes previos, comenzar desde 1
+    
+            // Crear el nuevo mensaje en el formato requerido
+            const newMessage = {
+                id: nextId, 
+                sequence_id: nextSequenceId,
+                role: "user",
+                type: "message",
+                content: message,
+                created_at: new Date().toISOString(), // Formato ISO para la fecha actual
+                is_end: false,
+                is_start: false,
+                status: null,
+            };
+    
+            // Retornar el nuevo arreglo de mensajes con el mensaje agregado
+            return [...prevMessages, newMessage];
+        });
     };
 
     const updateMessageStatus = (messageId, newStatus) => {
@@ -194,8 +215,8 @@ const ChatSection = () => {
         </div>
     );    
 
-    /* console.log("messages: ", messages);
-    console.log("messageGroups: ", messageGroups) */
+    console.log("messages: ", messages);
+    console.log("messageGroups: ", messageGroups)
 
     // #region MAIN JSX
     return (
@@ -294,7 +315,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:32:07",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 26,
@@ -306,7 +327,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:32:13",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 27,
@@ -351,7 +372,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:32:18",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 31,
@@ -363,7 +384,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:13",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 32,
@@ -408,7 +429,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:20",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 36,
@@ -420,7 +441,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:28",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 37,
@@ -476,7 +497,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:34",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 42,
@@ -488,7 +509,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:40",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 43,
@@ -588,7 +609,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:52",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 52,
@@ -600,7 +621,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:53",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 53,
@@ -645,7 +666,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:33:59",
         "is_end": false,
         "is_start": false,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 57,
@@ -657,7 +678,7 @@ const initialMessages = [
         "created_at": "2024-11-21T23:34:05",
         "is_end": true,
         "is_start": true,
-        "status": "Pending"
+        "status": "Executed"
     },
     {
         "id": 58,

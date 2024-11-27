@@ -15,7 +15,7 @@ import Cancel from '../icons/uncheck.svg';
 
 const ChatSection = () => {
     // #region States Refs & Effects
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState([]);
     const [messageGroups, setMessageGroups] = useState([]);
     const [expanded, setExpanded] = useState({});
     const outputRef = useRef(null);
@@ -51,6 +51,33 @@ const ChatSection = () => {
 
         setMessageGroups(groupedMessages);
     }, [messages]);
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                console.log("Fetching messages...");
+                const messagesResponse = await fetch(`/api/conversations/6/messages`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+    
+                if (!messagesResponse.ok) {
+                    throw new Error(`HTTP error! status: ${messagesResponse.status}`);
+                }
+    
+                const responseText = await messagesResponse.text();
+                const fetchedMessages = JSON.parse(responseText); // Convert manually
+                console.log("Fetched messages:", fetchedMessages);
+    
+                setMessages(fetchedMessages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+            }
+        };
+    
+        fetchMessages();
+    }, []);       
 
     // #region Functios
     const clearMessages = () => {
@@ -399,7 +426,7 @@ const ChatSection = () => {
 };
 
 // #region Initial Messages
-const initialMessages = [
+/* const initialMessages = [
     {
         "id": 23,
         "sequence_id": 1,
@@ -797,7 +824,7 @@ const initialMessages = [
         "is_start": true,
         "status": "Pending"
     },
-    /* {
+    {
         "id": 58,
         "sequence_id": 36,
         "role": "assistant",
@@ -840,7 +867,7 @@ const initialMessages = [
         "is_end": false,
         "is_start": false,
         "status": null
-    } */
-]  
+    }
+] */
 
 export default ChatSection;

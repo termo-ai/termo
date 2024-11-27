@@ -217,7 +217,14 @@ const ChatSection = () => {
                         status === 'Canceled' ? 'bg-red-600/50 text-red-200' :
                         'bg-yellow-600/50 text-yellow-200'
                     }`}>
-                        <div className='invert opacity-75 pr-1'>
+                        <div 
+                            className='invert opacity-75 pr-1'
+                            style={{
+                            filter: status === 'Executed' ? 'brightness(0) saturate(100%) invert(85%) sepia(25%) saturate(455%) hue-rotate(90deg) brightness(100%) contrast(100%)' :
+                                    status === 'Canceled' ? 'brightness(0) saturate(100%) invert(85%) sepia(25%) saturate(667%) hue-rotate(300deg) brightness(100%) contrast(100%)' :
+                                    'brightness(0) saturate(100%) invert(85%) sepia(25%) saturate(545%) hue-rotate(10deg) brightness(100%) contrast(100%)',
+                            }}
+                        >
                             <img
                                 src={status === 'Executed' ? Check : status === 'Canceled' ? Cancel : Pendig}
                                 alt={status}

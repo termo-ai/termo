@@ -16,6 +16,7 @@ import Cancel from '../icons/uncheck.svg';
 const ChatSection = () => {
     // #region States Refs & Effects
     const [messages, setMessages] = useState([]);
+    const [conversationId, setConversationId] = useState(6)
     const [messageGroups, setMessageGroups] = useState([]);
     const [expanded, setExpanded] = useState({});
     const outputRef = useRef(null);
@@ -56,7 +57,7 @@ const ChatSection = () => {
         const fetchMessages = async () => {
             try {
                 console.log("Fetching messages...");
-                const messagesResponse = await fetch(`/api/conversations/6/messages`, {
+                const messagesResponse = await fetch(`/api/conversations/${conversationId}/messages`, {
                     headers: {
                         'Accept': 'application/json',
                     },

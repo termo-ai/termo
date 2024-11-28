@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ChatIcon from "../icons/comment.svg";
 import Delete from "../icons/trash.svg";
 import Tree from "../icons/structure.svg";
@@ -7,8 +7,7 @@ import File from "../icons/file.svg";
 import Moon from "../icons/moon.svg";
 import { WebsocketContext } from "../../context/WebsocketContext";
 
-const SidebarSection = () => {
-  const [chats, setChats] = useState([]);
+const SidebarSection = ({chats, setChats, activeChat, setActiveChat}) => {
   const { connectionStatus } = useContext(WebsocketContext);
 
   const handleAddChat = () => {
@@ -21,6 +20,45 @@ const SidebarSection = () => {
   const handleDeleteChat = (id) => {
     setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
   };
+
+  const handleChangeChat = (id) => {
+    const getNewActive = async () => {
+      try{
+        const newActiveResponse = await fetch (`api/conversations/${id}/activate`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+          method: 'POST',
+        });
+        if(!newActiveResponse.ok){
+          throw new Error(`HTTP error! status: ${newActiveResponse.status}`)
+        }
+
+        const loadResponse = await fetch (`api/conversations/${id}/load`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+          method: 'POST',
+        });
+        if(!loadResponse.ok){
+          throw new Error(`HTTP error! status: ${loadResponse.status}`)
+        }
+
+        const responseText = await newActiveResponse.text();
+        const loadResponseText = await loadResponse.text();
+        const activeConversation = JSON.parse(responseText);
+        const loadResult = JSON.parse(loadResponseText);
+        console.log('activeConversation: ', activeConversation);
+        console.log('loadResult: ', loadResult);
+        console.log('id: ', id )
+        setActiveChat(id);
+      }catch(error){
+        console.log("Error getting new active chat: ", error)
+      }
+    }
+    getNewActive();
+  }
+
   return (
     <div className="w-1/6 bg-gray-800 flex flex-col justify-between h-screen border-r border-gray-700">
       {/* Top Section */}
@@ -75,13 +113,14 @@ const SidebarSection = () => {
           {chats.map((chat) => (
             <div
               key={chat.id}
-              className="flex items-center justify-between px-4 py-2 text-gray-300 bg-gray-800 rounded-lg group hover:bg-gray-500/50 transition"
+              className={`flex items-center justify-between px-4 py-2 text-gray-300 ${activeChat === chat.id ? 'bg-gray-500/50' : 'bg-gray-800'} rounded-lg group hover:bg-gray-500/50 transition`}
+              onClick={() => handleChangeChat(chat.id)}
             >
               <div className="flex flex-row space-x-3 items-center">
                 <div className="invert opacity-60">
                   <img src={ChatIcon} alt="Chat" width="14" height="14" />
                 </div>
-                <span>{chat.name}</span>
+                <span>{chat?.name ? chat.name : 'New Chat'}</span>
               </div>
               <button
                 onClick={() => handleDeleteChat(chat.id)}

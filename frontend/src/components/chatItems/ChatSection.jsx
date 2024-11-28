@@ -13,10 +13,8 @@ import Check from '../icons/check.svg';
 import Pendig from '../icons/clock.svg';
 import Cancel from '../icons/uncheck.svg';
 
-const ChatSection = () => {
+const ChatSection = ({ messages, setMessages }) => {
     // #region States Refs & Effects
-    const [messages, setMessages] = useState([]);
-    const [conversationId, setConversationId] = useState(6)
     const [messageGroups, setMessageGroups] = useState([]);
     const [expanded, setExpanded] = useState({});
     const outputRef = useRef(null);
@@ -51,36 +49,7 @@ const ChatSection = () => {
         }
 
         setMessageGroups(groupedMessages);
-    }, [messages]);
-
-    useEffect(() =>  {console.log(messages)}, [messages])
-
-    useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                console.log("Fetching messages...");
-                const messagesResponse = await fetch(`/api/conversations/${conversationId}/messages`, {
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                });
-    
-                if (!messagesResponse.ok) {
-                    throw new Error(`HTTP error! status: ${messagesResponse.status}`);
-                }
-    
-                const responseText = await messagesResponse.text();
-                const fetchedMessages = JSON.parse(responseText); // Convert manually
-                console.log("Fetched messages:", fetchedMessages);
-    
-                setMessages(fetchedMessages);
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-            }
-        };
-    
-        fetchMessages();
-    }, []);       
+    }, [messages]);     
 
     // #region Functios
     const clearMessages = () => {

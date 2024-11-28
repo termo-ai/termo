@@ -37,6 +37,7 @@ function connect() {
   // In websocket.js, update the confirmation handling
   ws.onmessage = async function (event) {
     const data = JSON.parse(event.data);
+    console.log("DATA", data);
 
     if (data.error) {
       appendErrorMessage(data.error);

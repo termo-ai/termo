@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import ChatIcon from "../icons/comment.svg";
 import Delete from "../icons/trash.svg";
 import Tree from "../icons/structure.svg";
 import Upload from "../icons/upload.svg";
 import File from "../icons/file.svg";
 import Moon from "../icons/moon.svg";
-import { useWebsocket } from "../../context/WebsocketContext";
+import { WebsocketContext } from "../../context/WebsocketContext";
 
 const SidebarSection = () => {
   const [chats, setChats] = useState([]);
-  const { connectionStatus } = useWebsocket();
+  const { connectionStatus } = useContext(WebsocketContext);
 
   const handleAddChat = () => {
     setChats((prevChats) => [

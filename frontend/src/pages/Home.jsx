@@ -51,6 +51,35 @@ const Home = () => {
     getActiveConversation();
   }, []);
 
+  const handleAddChat = () => {
+    const createChat = async () => {
+      try{
+        const createResponse = await fetch('api/conversations/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              title: 'New Chat'
+          })
+        });
+
+        if(!createResponse.ok){
+          throw new Error(`HTTP error! status: ${createResponse.status}`);
+        };
+
+        const conversation = await createResponse.json();
+        console.log(conversation);
+        setActiveChat(conversation.id);
+        setChats((prevChats) => [
+          { id: conversation.id, name: "New Chat" },
+          ...prevChats,
+        ]);
+      }catch (error){
+        console.log("Error creating new chat: ", error)
+      }
+    }
+    createChat();
+  };
+
   useEffect(() => {
   const fetchMessages = async () => {
     if(activeChat){
@@ -91,6 +120,7 @@ const Home = () => {
         setActiveChat={setActiveChat}
         messages={messages}
         setMessages={setMessages}
+        onCreateChat={handleAddChat}
       />
       <ChatSection 
         messages={messages}

@@ -7,15 +7,8 @@ import File from "../icons/file.svg";
 import Moon from "../icons/moon.svg";
 import { WebsocketContext } from "../../context/WebsocketContext";
 
-const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, setMessages}) => {
+const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, setMessages, onCreateChat}) => {
   const { connectionStatus } = useContext(WebsocketContext);
-
-  const handleAddChat = () => {
-    setChats((prevChats) => [
-      ...prevChats,
-      { id: Date.now(), name: "New Chat" },
-    ]);
-  };
 
   const handleDeleteChat = (id) => {
     const deleteChat = async () => {
@@ -107,7 +100,7 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
           </div>
         </div>
         <button
-          onClick={handleAddChat}
+          onClick={onCreateChat}
           className="mt-4 pl-2 pr-4 py-2 text-gray-300 rounded-lg hover:bg-gray-500/50 transition flex items-center"
         >
           <svg

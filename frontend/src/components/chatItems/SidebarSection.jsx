@@ -11,30 +11,38 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
   const { connectionStatus } = useContext(WebsocketContext);
 
   const handleDeleteChat = (id) => {
-    const deleteChat = async () => {
-      try {
-        const deleteResponse = await fetch (`api/conversations/${id}`, {
-          headers: {
-            'Accept': 'application/json',
-          },
-          method: 'DELETE',
-        });
-        if (!deleteResponse.ok){
-          throw new Error(`HTTP error! status: ${deleteResponse.status}`)
+    if (window.confirm("Are you sure you want to delete this chat? This action cannot be undone.")) {
+      const deleteChat = async () => {
+        try {
+          const deleteResponse = await fetch(`api/conversations/${id}`, {
+            headers: {
+              'Accept': 'application/json',
+            },
+            method: 'DELETE',
+          });
+          if (!deleteResponse.ok) {
+            throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+          }
+  
+          const responsesText = await deleteResponse.text();
+          const deleteResult = JSON.parse(responsesText);
+          console.log("Chat deleted successfully:", deleteResult);
+        } catch (error) {
+          console.log("Error deleting chat: ", error);
         }
-
-        const responsesText = await deleteResponse.text();
-        const deleteResult = JSON.parse(responsesText);
-      } catch (error) {
-        console.log("Error deleting chat: ", error)
-      }
+      };
+  
+      deleteChat();
+      setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
+      setActiveChat(null);
+      setMessages([]);
+    } else {
+      console.log("Delete chat canceled.");
     }
-    deleteChat()
-    setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
-    setMessages([]);
-  };
+  };  
 
   const handleChangeChat = (id) => {
+    console.log("id: ", id)
     const getNewActive = async () => {
       try{
         const newActiveResponse = await fetch (`api/conversations/${id}/activate`, {
@@ -125,7 +133,10 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
             <div
               key={chat.id}
               className={`flex items-center justify-between px-4 py-2 text-gray-300 ${activeChat === chat.id ? 'bg-gray-500/50' : 'bg-gray-800'} rounded-lg group hover:bg-gray-500/50 transition`}
-              onClick={() => handleChangeChat(chat.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteChat(chat.id);
+              }}
             >
               <div className="flex flex-row space-x-3 items-center">
                 <div className="invert opacity-60">
@@ -134,7 +145,10 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
                 <span>{chat?.name ? chat.name : 'New Chat'}</span>
               </div>
               <button
-                onClick={() => handleDeleteChat(chat.id)}
+                onClick={(e) => {
+          e.stopPropagation(); // Detiene la propagación del evento
+          handleDeleteChat(chat.id);
+        }}
                 className="invert opacity-0 group-hover:opacity-60"
               >
                 <img src={Delete} alt="Delete" width="14" height="14" />

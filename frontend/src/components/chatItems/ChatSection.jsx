@@ -53,6 +53,8 @@ const ChatSection = () => {
         setMessageGroups(groupedMessages);
     }, [messages]);
 
+    useEffect(() =>  {console.log(messages)}, [messages])
+
     useEffect(() => {
         const fetchMessages = async () => {
             try {

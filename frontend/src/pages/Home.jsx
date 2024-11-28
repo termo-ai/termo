@@ -67,7 +67,6 @@ const Home = () => {
                 };
 
                 const conversation = await createResponse.json();
-                console.log(conversation);
                 setActiveChat(conversation.id);
                 setChats((prevChats) => [
                     { id: conversation.id, name: "New Chat" },

@@ -8,8 +8,10 @@ import Moon from "../icons/moon.svg";
 import { WebsocketContext } from "../../context/WebsocketContext";
 
 const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, setMessages, onCreateChat}) => {
+    //#region States & Effects
     const { connectionStatus } = useContext(WebsocketContext);
 
+    //#region Functions
     const handleDeleteChat = (id) => {
         if (window.confirm("Are you sure you want to delete this chat? This action cannot be undone.")) {
             const deleteChat = async () => {
@@ -78,6 +80,7 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
         getNewActive();
     }
 
+    //#region Main JSX
     return (
         <div className="w-1/6 bg-gray-800 flex flex-col justify-between h-screen border-r border-gray-700">
             {/* Top Section */}

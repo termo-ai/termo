@@ -3,6 +3,7 @@ import ChatSection from "../components/chatItems/ChatSection";
 import SidebarSection from "../components/chatItems/SidebarSection";
 
 const Home = () => {
+    // #region States & Effects
     const [chats, setChats] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -51,6 +52,34 @@ const Home = () => {
         getActiveConversation();
     }, []);
 
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if(activeChat){
+                try {
+                    const messagesResponse = await fetch(`/api/conversations/${activeChat}/messages`, {
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    if (!messagesResponse.ok) {
+                        throw new Error(`HTTP error! status: ${messagesResponse.status}`);
+                    }
+
+                    const responseText = await messagesResponse.text();
+                    const fetchedMessages = JSON.parse(responseText); // Convert manually
+
+                    setMessages(fetchedMessages);
+                } catch (error) {
+                    console.error("Error fetching messages:", error);
+                };
+            };
+        }
+
+        fetchMessages();
+    }, [activeChat]);  
+
+    // #region Functions
     const handleAddChat = () => {
         const createChat = async () => {
             try{
@@ -79,37 +108,7 @@ const Home = () => {
         createChat();
     };
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            if(activeChat){
-                try {
-                    const messagesResponse = await fetch(`/api/conversations/${activeChat}/messages`, {
-                        headers: {
-                            'Accept': 'application/json',
-                        },
-                    });
-
-                    if (!messagesResponse.ok) {
-                        throw new Error(`HTTP error! status: ${messagesResponse.status}`);
-                    }
-
-                    const responseText = await messagesResponse.text();
-                    const fetchedMessages = JSON.parse(responseText); // Convert manually
-
-                    setMessages(fetchedMessages);
-                } catch (error) {
-                    console.error("Error fetching messages:", error);
-                };
-            };
-        }
-
-        fetchMessages();
-    }, [activeChat]);  
-
-    useEffect(() => {
-        console.log('activeChat', activeChat)
-    }, [activeChat])
-
+    // #region Main JSX
     return (
         <div className="flex h-screen w-screen bg-gray-800 text-white">
             <SidebarSection

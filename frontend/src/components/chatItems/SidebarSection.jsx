@@ -133,10 +133,7 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
             <div
               key={chat.id}
               className={`flex items-center justify-between px-4 py-2 text-gray-300 ${activeChat === chat.id ? 'bg-gray-500/50' : 'bg-gray-800'} rounded-lg group hover:bg-gray-500/50 transition`}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteChat(chat.id);
-              }}
+              onClick={() => handleChangeChat(chat.id)}
             >
               <div className="flex flex-row space-x-3 items-center">
                 <div className="invert opacity-60">
@@ -146,9 +143,9 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
               </div>
               <button
                 onClick={(e) => {
-          e.stopPropagation(); // Detiene la propagación del evento
-          handleDeleteChat(chat.id);
-        }}
+                  e.stopPropagation();
+                  handleDeleteChat(chat.id);
+                }}
                 className="invert opacity-0 group-hover:opacity-60"
               >
                 <img src={Delete} alt="Delete" width="14" height="14" />

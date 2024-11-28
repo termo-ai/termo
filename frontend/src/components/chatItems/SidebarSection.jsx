@@ -7,7 +7,7 @@ import File from "../icons/file.svg";
 import Moon from "../icons/moon.svg";
 import { WebsocketContext } from "../../context/WebsocketContext";
 
-const SidebarSection = ({chats, setChats, activeChat, setActiveChat}) => {
+const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, setMessages}) => {
   const { connectionStatus } = useContext(WebsocketContext);
 
   const handleAddChat = () => {
@@ -18,7 +18,27 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat}) => {
   };
 
   const handleDeleteChat = (id) => {
+    const deleteChat = async () => {
+      try {
+        const deleteResponse = await fetch (`api/conversations/${id}`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+          method: 'DELETE',
+        });
+        if (!deleteResponse.ok){
+          throw new Error(`HTTP error! status: ${deleteResponse.status}`)
+        }
+
+        const responsesText = await deleteResponse.text();
+        const deleteResult = JSON.parse(responsesText);
+      } catch (error) {
+        console.log("Error deleting chat: ", error)
+      }
+    }
+    deleteChat()
     setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
+    setMessages([]);
   };
 
   const handleChangeChat = (id) => {
@@ -46,11 +66,9 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat}) => {
 
         const responseText = await newActiveResponse.text();
         const loadResponseText = await loadResponse.text();
-        const activeConversation = JSON.parse(responseText);
+        const activeConversation = JSON.parse(responseText); // What I do with this?
         const loadResult = JSON.parse(loadResponseText);
-        console.log('activeConversation: ', activeConversation);
-        console.log('loadResult: ', loadResult);
-        console.log('id: ', id )
+
         setActiveChat(id);
       }catch(error){
         console.log("Error getting new active chat: ", error)

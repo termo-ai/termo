@@ -89,6 +89,8 @@ const Home = () => {
         setChats={setChats}
         activeChat={activeChat}
         setActiveChat={setActiveChat}
+        messages={messages}
+        setMessages={setMessages}
       />
       <ChatSection 
         messages={messages}

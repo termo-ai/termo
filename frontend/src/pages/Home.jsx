@@ -125,6 +125,8 @@ const Home = () => {
       <ChatSection 
         messages={messages}
         setMessages={setMessages}
+        onCreateChat={handleAddChat}
+        activeChat={activeChat}
       />
     </div>
   );

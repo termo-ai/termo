@@ -146,8 +146,8 @@ const SidebarSection = ({chats, setChats, activeChat, setActiveChat, messages, s
                         </div>
                         <button
                             onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteChat(chat.id);
+                                e.stopPropagation();
+                                handleDeleteChat(chat.id);
                             }}
                             className="invert opacity-0 group-hover:opacity-60"
                         >

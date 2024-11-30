@@ -9,9 +9,13 @@ let isCodeBlockActive = false;
 let isAwaitingConfirmation = false;
 let confirmationResolver = null;
 
+//FUNCION DE CONECCION
 function connect() {
+  //TENEMOS LA URL
   ws = new WebSocket(`ws://${window.location.host}/ws`);
 
+  //METODO OPEN
+  //solo cambiamos el color y el texto a conectado
   ws.onopen = function () {
     document.getElementById("connection-status").textContent = "Connected";
     document
@@ -22,6 +26,8 @@ function connect() {
       .previousElementSibling.classList.add("bg-green-800");
   };
 
+  //METODO CLOSE
+  //solo cambiamos el color y el texto a desconectado
   ws.onclose = function () {
     document.getElementById("connection-status").textContent =
       "Reconnecting...";
@@ -34,25 +40,28 @@ function connect() {
     setTimeout(connect, 1000);
   };
 
-  // In websocket.js, update the confirmation handling
+  //METODO ONMESSAGE
+  //cachamos el evento
   ws.onmessage = async function (event) {
     const data = JSON.parse(event.data);
-    console.log("DATA", data);
+    console.log("DATAAAA", data);
 
     if (data.error) {
       appendErrorMessage(data.error);
       return;
     }
 
+    //SI DATA ES === confirmation
     if (data.type === "confirmation") {
       isAwaitingConfirmation = true;
 
-      // Set current code block status to pending
+      //Si currentCodeBlock es true llama a la funcion updateCodeBlockStatus
+      //PENDIENTE
       if (currentCodeBlock) {
         updateCodeBlockStatus(currentCodeBlock, "pending");
       }
 
-      // Create and append confirmation buttons
+      //Manda a llamar a createConfirmationButtons que crea botones
       const confirmationButtons = createConfirmationButtons();
       if (currentMessageDiv) {
         currentMessageDiv.appendChild(confirmationButtons);
@@ -68,6 +77,7 @@ function connect() {
         document.getElementById("confirm-execution").onclick = () => {
           resolve(true);
           confirmationButtons.remove();
+          //Si currentCodeBlock es true llama a la funcion updateCodeBlockStatus
           if (currentCodeBlock) {
             updateCodeBlockStatus(currentCodeBlock, "executed");
           }
@@ -81,6 +91,7 @@ function connect() {
           }
         };
       });
+      console.log("userChoice", userChoice);
 
       // Send the user's choice back to the server
       ws.send(

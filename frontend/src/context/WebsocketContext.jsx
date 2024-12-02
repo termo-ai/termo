@@ -65,7 +65,9 @@ export const WebsocketProvider = ({ children }) => {
     };
 
     websocket.onmessage = async (event) => {
+      console.log("EVENT", event.data);
       const data = JSON.parse(event.data);
+      console.log("DATTTTTAAAA", data);
 
       if (data.error) {
         setStatusWsMessage(true);
@@ -100,6 +102,8 @@ export const WebsocketProvider = ({ children }) => {
             })
           );
           setStateCurrentCodeBlock(userChoice ? "executed" : "canceled");
+        } catch {
+          console.log("ERRROR");
         } finally {
           setIsAwaitingConfirmation(false);
         }

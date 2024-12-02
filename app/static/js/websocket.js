@@ -44,7 +44,8 @@ function connect() {
   //cachamos el evento
   ws.onmessage = async function (event) {
     const data = JSON.parse(event.data);
-    console.log("DATAAAA", data);
+    console.log("EVENT", event.data);
+    console.log("DATAAAAaaa", data);
 
     if (data.error) {
       appendErrorMessage(data.error);
@@ -98,6 +99,7 @@ function connect() {
         JSON.stringify({
           type: "confirmation_response",
           confirmed: userChoice,
+          conversation_id: 40,
         })
       );
 

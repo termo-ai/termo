@@ -209,19 +209,25 @@ export const WebsocketProvider = ({ children }) => {
 
   // Enviar mensajes
   const sendMessage = useCallback(
-    (message) => {
-      console.log("papasconquesoyrajas", message);
+    (message, id) => {
+      console.log("Mensaje a enviar:", message);
+      console.log("Id de conversación a enviar:", id);
       if (message.trim() && ws?.readyState === WebSocket.OPEN) {
+        const messageData = {
+          prompt: message,
+          conversation_id: id,
+        }
         setMessages((prev) => [
           ...prev,
           {
             type: "message",
             content: message,
+            conversation_id: id,
             sender: "user",
           },
         ]);
-        console.log("messages111", messages);
-        ws.send(JSON.stringify({ prompt: message }));
+        console.log("Sending message:", messageData);
+        ws.send(JSON.stringify(messageData));
         return true;
       }
       return false;

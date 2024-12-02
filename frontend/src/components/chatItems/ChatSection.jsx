@@ -116,7 +116,7 @@ const ChatSection = ({ messages, setMessages, onCreateChat, activeChat }) => {
     if (!activeChat) {
       onCreateChat();
     }
-    sendMessage(message);
+    sendMessage(message, activeChat);
     setMessages((prevMessages) => {
       // Get ids
       const lastMessage = prevMessages[prevMessages.length - 1];

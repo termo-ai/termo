@@ -10,6 +10,7 @@ import React, {
 export const WebsocketContext = createContext();
 
 // Proveedor del WebSocket
+// #region WebSocket Provider
 export const WebsocketProvider = ({ children }) => {
   const [ws, setWs] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState("Disconnected");
@@ -26,6 +27,7 @@ export const WebsocketProvider = ({ children }) => {
   console.log("messagessssss", messages);
 
   // Función para conectar al WebSocket
+  // #region Connect Function
   const connect = useCallback(() => {
     // Verificar si la conexión ya existe
     if (ws && ws.readyState !== WebSocket.CLOSED) {
@@ -112,6 +114,7 @@ export const WebsocketProvider = ({ children }) => {
   }, [ws]);
 
   // Mecanismo de ping para mantener conexión estable
+  // #region Ping Function
   useEffect(() => {
     let pingInterval;
     if (ws) {
@@ -134,6 +137,7 @@ export const WebsocketProvider = ({ children }) => {
   }, [connect]);
 
   //FUNCIONES
+  // #region Messages Type
   const handleMessageTypes = useCallback((data) => {
     switch (data.type) {
       case "message":
@@ -178,6 +182,8 @@ export const WebsocketProvider = ({ children }) => {
         console.warn("Unhandled message type:", data.type);
     }
   }, []);
+
+  // #region Confirmation Function
   const handleConfirmation = () => {
     return new Promise((resolve) => {
       setMessages((prev) => [
@@ -208,6 +214,7 @@ export const WebsocketProvider = ({ children }) => {
   // }, []);
 
   // Enviar mensajes
+  // #region Send Function
   const sendMessage = useCallback(
     (message, id) => {
       console.log("Mensaje a enviar:", message);
